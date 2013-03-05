@@ -1,0 +1,6 @@
+//- this is literally just a quick way of converting a javascript array into a HTML-friendly list
+//- note: the array passed in must contain objects with a .name property
+ul
+each i in of
+  li
+    a(href=linkpref + '?' + varname + '=' + i.name)= i.name

@@ -1,0 +1,21 @@
+extends layout
+block stylesheets
+  link(rel='stylesheet',type='text/css',href='/stylesheets/register.css')
+block javascripts
+  script(src='/javascripts/register.js')
+block content
+  form#registerform(action='/register',method='post')
+    fieldset
+      legend Register
+      label(for='human') Display Name
+      input(type='text',name='human')
+      label(for='username') Username
+      input(type='text',name='username')
+      label(for='password') Password
+      input(type='text',name='password')
+      label(for='email') Email Address
+      input(type='email',name='email')
+      if admin
+        label(for='admin') Administrator Account
+        input(type='checkbox',name='admin')
+      input(type='submit',value='Register')

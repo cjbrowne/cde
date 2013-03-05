@@ -1,0 +1,17 @@
+extends layout
+block content
+  if typeof(user) === 'undefined'
+    p Only authorised users may create languages, please log in using the form above
+  else
+    form(method='post')
+      fieldset
+        label(for='name') Name
+        input(type='text',name='name',value=language)
+        label(for='sdesc') Short Description
+        input(type='text',name='sdesc')
+        label(for='ldesc') Long Description
+        textarea(name='ldesc')
+        if user.admin
+          label(for='official') Official Language
+          input(type='checkbox',name='official')
+        input(type='submit',value='Create')

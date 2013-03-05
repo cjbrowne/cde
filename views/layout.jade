@@ -1,0 +1,27 @@
+doctype 5
+html
+  head
+    title Child Dictionary Editor: #{title}
+    //- style.css goes first so it can be overridden if necessary
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    block stylesheets
+    //- jquery goes first because pretty much everything else needs it
+    script(src='/javascripts/jquery.js')
+    block javascripts
+    //- client.js scheduled for deprecation (each view should have its own .js file to preserve my sanity)
+    script(src='/javascripts/client.js')
+  body
+    #loginbox
+    if typeof(cwl) !== 'undefined'
+      #lang= cwl.name
+    else 
+      if typeof(user) !== 'undefined'
+        //-
+          this is a pretty heavy class of error, we can't really do anything about this level of corruption except
+          recommend that the user tries changing the language or contacting support to get their account manually
+          fixed
+        #lang error!
+    #header
+      a.left(href='/search') Lookup Word
+      a.right(href='/change') Change Language
+    block content
