@@ -23,10 +23,19 @@ var schema = {
         // languages marked as 'official' are thunked to the top of search results
         official: 'boolean',
         sdesc: 'string',
-        ldesc: 'string'
+        ldesc: 'string',
+        dict: 'objectId'
       }),
-      
     };
+    schema.dict = mongoose.Schema({
+        language: 'objectId',
+        words: [{
+          word:'string',
+          classification:'string',
+          definition:'string',
+          tags:[String]
+        }]
+    });
     schema.user = mongoose.Schema({
       username: 'string',
       password: 'string',
@@ -36,8 +45,9 @@ var schema = {
       cwl: 'ObjectId',
       admin: 'boolean'
     });
+    Language = mongoose.model('Language',schema.lang),
     User = mongoose.model('User',schema.user),
-    Language = mongoose.model('Language',schema.lang);
+    Dictionary = mongoose.model('Dictionary',schema.dict);
 
 // must be included after mongoose setup
 var routes = require('./routes')
@@ -56,19 +66,32 @@ app.configure(function(){
   app.use(passport.initialize());
   app.use(passport.session());
   app.use(function(req,res,next) {
-    // set up the 'current working language' local variable
     if(typeof(req.user)!=='undefined') {
-      // the second check invalidates the cache in cases where the user has logged out or changed languages
+      // set up the 'current working language' local variable
       if(typeof(req.session.lang) === 'undefined' || req.session.lang._id != req.user.cwl) {
         Language.findOne({_id:req.user.cwl},function(err,cwl) {
           if(err) { console.log('Mongoose error: ' + err); }
-          req.session.lang = cwl;
-          console.log('session language cache miss');
-          res.locals.cwl = cwl;
+          else {
+            console.log('session language cache miss');
+            req.session.lang = res.locals.cwl = cwl;
+          }
         });
       } else {
         console.log('session language cache hit');
         res.locals.cwl = req.session.lang;
+      }
+      // great, now that we have a language, let's grab the relevant dictionary from mongo
+      if(typeof(req.session.dict) === 'undefined' || req.session.dict == null || req.session.dict.lang != req.user.cwl) {
+        Dictionary.findOne({_id:req.user.cwl},function(err,dict) {
+          if(err) { console.log('Mongoose error: ' + err); }
+          else {
+            console.log('session dictionary cache miss');
+            req.session.dict = res.locals.dict = dict;
+          }
+        });
+      } else {
+        console.log('session dictionary cache hit');
+        res.locals.dict = req.session.dict;
       }
       // also set up the 'user' variable which needs to be available everywhere
       res.locals.user = req.user;

@@ -1,14 +1,8 @@
 var mongoose = require('mongoose');
 
-var schema = {
-      dict : mongoose.Schema({
-        language: 'objectId',
-        words: [{word:'string',classification:'string',definition:'string',tags:[String]}]
-      })
-    },
-    Language = mongoose.model('Language'),
+var Language = mongoose.model('Language'),
     User = mongoose.model('User'),
-    Dictionary = mongoose.model('Dictionary',schema.dict);
+    Dictionary = mongoose.model('Dictionary');
 
 // GET home (or dash if logged in)
 exports.index = function(req,res) {
