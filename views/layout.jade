@@ -11,11 +11,15 @@ html
     //- client.js scheduled for deprecation (each view should have its own .js file to preserve my sanity)
     script(src='/javascripts/client.js')
   body
+    if typeof e !== 'undefined'
+      #error= e
+    else
+      #error
     #loginbox
-    if typeof(cwl) !== 'undefined'
+    if typeof cwl !== 'undefined'
       #lang= cwl.name
     else 
-      if typeof(user) !== 'undefined'
+      if typeof user !== 'undefined'
         //-
           this is a pretty heavy class of error, we can't really do anything about this level of corruption except
           recommend that the user tries changing the language or contacting support to get their account manually

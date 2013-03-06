@@ -73,28 +73,33 @@ app.configure(function(){
           if(err) { console.log('Mongoose error: ' + err); }
           else {
             console.log('session language cache miss');
-            req.session.lang = res.locals.cwl = cwl;
+            req.session.lang = app.locals.cwl = cwl;
           }
         });
       } else {
         console.log('session language cache hit');
-        res.locals.cwl = req.session.lang;
+        app.locals.cwl = req.session.lang;
       }
       // great, now that we have a language, let's grab the relevant dictionary from mongo
       if(typeof(req.session.dict) === 'undefined' || req.session.dict == null || req.session.dict.lang != req.user.cwl) {
         Dictionary.findOne({_id:req.user.cwl},function(err,dict) {
           if(err) { console.log('Mongoose error: ' + err); }
           else {
-            console.log('session dictionary cache miss');
-            req.session.dict = res.locals.dict = dict;
+            if(!dict) {
+              console.log('session dictionary cache double miss');
+              app.locals.e = 'Dictionary not found';
+            } else {
+              console.log('session dictionary cache miss');
+              req.session.dict = app.locals.dict = dict;
+            }
           }
         });
       } else {
         console.log('session dictionary cache hit');
-        res.locals.dict = req.session.dict;
+        app.locals.dict = req.session.dict;
       }
       // also set up the 'user' variable which needs to be available everywhere
-      res.locals.user = req.user;
+      app.locals.user = req.user;
     }
     next();
   });

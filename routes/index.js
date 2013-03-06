@@ -74,7 +74,7 @@ exports.postcreate = function(req,res) {
     // set the current working language to the newly-created language
     req.user.cwl = lang._id;
     req.user.save();
-    res.redirect('/');
+    res.render('dash');
   });
 };
 

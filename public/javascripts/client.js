@@ -13,7 +13,14 @@ $(function() {
           $("#loginerror").html("wrong username or password").fadeIn('fast');
         } else {
           // re-direct to the dashboard (yeah, it's weird, shut up)
-          window.location.reload();
+          $.ajax({
+            url:"",
+            context:document.body,
+            success:function(s,x) {
+              $(this).html(s);
+            }
+          });
+          location.reload();
         }
       });
       return false;
