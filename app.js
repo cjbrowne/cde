@@ -66,7 +66,7 @@ app.configure(function(){
   app.use(passport.initialize());
   app.use(passport.session());
   app.use(function(req,res,next) {
-    if(typeof(req.user)!=='undefined') {
+    if(typeof req.user !== 'undefined') {
       // set up the 'current working language' local variable
       if(typeof(req.session.lang) === 'undefined' || req.session.lang._id != req.user.cwl) {
         Language.findOne({_id:req.user.cwl},function(err,cwl) {
@@ -75,11 +75,19 @@ app.configure(function(){
             console.log('session language cache miss');
             req.session.lang = app.locals.cwl = cwl;
           }
+          next();
         });
       } else {
         console.log('session language cache hit');
         app.locals.cwl = req.session.lang;
+        next();
       }
+    } else {
+      next(); // just pass it straight on if user is undefined
+    }
+  });
+  app.use(function(req,res,next) {
+    if(typeof req.user !== 'undefined') {
       // great, now that we have a language, let's grab the relevant dictionary from mongo
       if(typeof(req.session.dict) === 'undefined' || req.session.dict == null || req.session.dict.lang != req.user.cwl) {
         Dictionary.findOne({_id:req.user.cwl},function(err,dict) {
@@ -93,15 +101,19 @@ app.configure(function(){
               req.session.dict = app.locals.dict = dict;
             }
           }
+          app.locals.user = req.user;
+          // NOW we move on with the middleware chain
+          next();
         });
       } else {
         console.log('session dictionary cache hit');
         app.locals.dict = req.session.dict;
+        app.locals.user = req.user;
+        next();
       }
-      // also set up the 'user' variable which needs to be available everywhere
-      app.locals.user = req.user;
+    } else {
+      next(); // if user undefined, proceed
     }
-    next();
   });
   app.use(app.router);
   app.use(express.static(path.join(__dirname, 'public')));
